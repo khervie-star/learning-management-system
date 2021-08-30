@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import get_user_model
-from instructor.serializers import CourseSerializer
+from instructor.serializers import CourseSerializer, LessonSerializer
 from instructor.models import Course
 
 USER = get_user_model()
@@ -61,9 +61,9 @@ class CourseView(APIView):
     def delete(self, request, *args, **kwargs):
         slug_ = kwargs.get("id", None)
         if not slug_:
-            try:
-                course_object = Course.objects.get(slug=slug_)
-                return Response({"error": "method /DELETE/ not allowed"}, status="405")
+            return Response({"error": "method /DELETE/ not allowed"}, status="405")
+        try:
+            course_object = Course.objects.get(slug=slug_)
         except ObjectDoesNotExist:
             return Response({"error": "method /DELETE/ not allowed"}, status="405")
         else:
