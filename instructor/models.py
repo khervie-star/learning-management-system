@@ -10,8 +10,10 @@ USER = settings.AUTH_USER_MODEL
 class DummyModel(models.Model):
     name = models.CharField(max_length=500)
 
+
 class Course(models.Model):
-    difficulty = (('Beginner', 'Beginner'), ('Intermediate', 'Intermediate'), ('Advance', 'Advance'))
+    difficulty = (('Beginner', 'Beginner'), ('Intermediate',
+                                             'Intermediate'), ('Advance', 'Advance'))
 
     author = models.ForeignKey(USER, on_delete=models.PROTECT, related_name='created_courses')
     name = models.CharField(max_length=500)
@@ -20,8 +22,9 @@ class Course(models.Model):
     skills_covered = models.TextField()
     level = models.CharField(max_length=15, choices=difficulty)
     course_description = models.TextField()
-    thumbnail = models.ImageField(upload_to='thumbnail/course/')
-    syllabus = models.FileField(upload_to='syllabus/')
+    # not meant to be nullable. change it
+    thumbnail = models.ImageField(upload_to='thumbnail/course/', null=True, blank=True)
+    syllabus = models.FileField(upload_to='syllabus/', null=True, blank=True)
     slug = models.SlugField(blank=True, max_length=300, unique=True)
 
     def __str__(self):
@@ -35,8 +38,9 @@ class Course(models.Model):
             self.slug = slug_generator(self)
         return super(Course, self).save(*args, **kwargs)
 
+
 class Lesson(models.Model):
-    name  = models.CharField(max_length=1000)
+    name = models.CharField(max_length=1000)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_lessons')
     thumbnail = models.ImageField(upload_to='thumbnail/lesson/')
     descrption = models.CharField(max_length=900)
@@ -46,7 +50,7 @@ class Lesson(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-           self.slug = slug_generator(self)
+            self.slug = slug_generator(self)
         return super(Lesson, self).save(*args, **kwargs)
 
 
@@ -60,6 +64,7 @@ class Content(models.Model):
 class VideoContent(models.Model):
     url = models.TextField(blank=True, null=True)
     file = models.FileField(upload_to='video-content/', blank=True, null=True)
+
 
 class TextContent(models.Model):
     content = models.TextField()
