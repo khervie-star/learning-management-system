@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import get_user_model
 from instructor.serializers import CourseSerializer, LessonSerializer
-from instructor.models import Course
+from instructor.models import Course, Lesson
 
 USER = get_user_model()
 
@@ -72,7 +72,73 @@ class CourseView(APIView):
 
 
 class LessonView(APIView):
-    pass
+    # add permissions and authorization
+    # slug: -> course slug
+    serializer_class = LessonSerializer
+
+    def get(self, request, *args, **kwargs):
+        _slug = kwargs.get("slug", None)
+        lesson_slug = kwargs.get("lesson_slug", None)
+        if not _slug:
+            # get a  single lesson instance
+            if not lesson_slug:
+                return Response({"message": "provide a lesson refrence/slug"}, status="405")
+            else:
+                try:
+                    lessons = Lesson.objects.get(slug=lesson_slug)
+                except ObjectDoesNotExist:
+                    return Response({"message": "The object refrence/ slug passed does not exists"}, status="405")
+                else:
+                    serialized_object = self.serializer_class(lessons, many=True)
+                    return Response({"data": serialized_object.data}, status="200")
+        else:
+            # get all lessons associated to a course
+            try:
+                lesson = Lesson.objects.all(course__slug=_slug)
+            except ObjectDoesNotExist:
+                return Response({"status": "Failed", "message": " The object accessed does not exist"}, status="404")
+            else:
+                serialized_object = self.serializer_class(lesson)
+                return Response({"data": serialized_object.data}, status="200")
+
+    def post(self, request):
+        received_lesson_data = request.data
+        serialized_data = self.serializer_class(data=received_lesson_data)
+        serialized_data.is_valid(raise_exception=True)
+        if serialized_data.errors:
+            return Response({"error": serialized_data.errors})
+        else:
+            # testing
+            # serialized_data.save(author=USER.objects.get(name="Dev Admin"))
+            serialized_data.save(author=request.user)
+            return Response({"status": "Success", "Message": "Course created successfully", "data": serialized_data.data}, status="201")
+
+    def patch(self, request, *args, **kwargs):
+        _slug = kwargs.get("slug", None)
+        if not _slug:
+            return Response({"error": "method /PATCH/ not allowed"}, status="405")
+        try:
+            lesson_object = Lesson.objects.get(course__slug=_slug)
+        except ObjectDoesNotExist:
+            return Response({"error": "method /PATCH/ not allowed"}, status="405")
+        else:
+            serialized_data = self.serializer_class(
+                instance=lesson_object, data=request.data, partial=True)
+            serialized_data.is_valid(raise_exception=True)
+            serialized_data.save()
+            return Response({'message': 'Update successful', "data": serialized_data.data}, status="200")
+
+    def delete(self, request, *args, **kwargs):
+        slug_ = kwargs.get("id", None)
+        if not slug_:
+            return Response({"error": "method /DELETE/ not allowed"}, status="405")
+        try:
+            lesson_object = Lesson.objects.get(course__slug=slug_)
+        except ObjectDoesNotExist:
+            return Response({"error": "method /DELETE/ not allowed"}, status="405")
+        else:
+            lesson_object.delete()
+            return Response({"message": "Course deleted"}, status="200")
 
 
 class ContentView(APIView):

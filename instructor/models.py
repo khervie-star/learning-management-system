@@ -55,6 +55,9 @@ class Lesson(models.Model):
             self.slug = slug_generator(self)
         return super(Lesson, self).save(*args, **kwargs)
 
+    def __str__(self):
+        return self.name
+
 
 class Content(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='lesson_content')

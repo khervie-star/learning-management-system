@@ -4,7 +4,7 @@ from instructor.models import Course, Lesson, Content
 
 class CourseSerializer(serializers.ModelSerializer):
     author = serializers.SerializerMethodField('get_author_name')
-    course_lessons = serializers.PrimaryKeyRelatedField(queryset=Lesson.objects.all(), many=True)
+    course_lessons = serializers.SlugRelatedField(slug_field="slug", many=True, read_only=True)
 
     class Meta:
         model = Course
