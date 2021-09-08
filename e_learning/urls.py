@@ -7,4 +7,6 @@ urlpatterns = [
     path('user/', include("userauth.urls", )),
     # instructor app
     path('', include('instructor.urls')),
+    #  catalog app
+    path('catalog/', include('catalog.urls')),
 ]
