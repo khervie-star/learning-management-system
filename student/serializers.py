@@ -1,9 +1,12 @@
 from rest_framework.serializers import ModelSerializer
 
 from student.models import Profile
+from instructor.serializers import CourseSerializer
 
 
 class ProfileSerializer(ModelSerializer):
+    courses = CourseSerializer(many=True)
+
     class Meta:
         model = Profile
         fields = '__all__'

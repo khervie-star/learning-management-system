@@ -8,5 +8,5 @@ urlpatterns = [
     #  profile ['GET']
     path('profile', views.profile,),
     # profile ['PATCH', 'POST']
-    # path('create-update/', views.create_update_profile,),
+    path('create-update/', views.create_update_profile,),
 ]

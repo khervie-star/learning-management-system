@@ -14,7 +14,7 @@ def profile(request):
     authenticated_user = request.user
     serializer = ProfileSerializer
 
-    _profile = get_object_or_404(Profile, user=authenticated_user)
+    _profile = get_object_or_404(Profile, user=1)
     serialized_data = serializer(_profile)
     return Response({"data": serialized_data.data}, status="200")
 
