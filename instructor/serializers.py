@@ -28,7 +28,7 @@ class LessonSerializer(serializers.ModelSerializer):
         )
 
 
-class ContentSerializer(serializers.ModelSerializer):
+class VideoContentSerializer(serializers.ModelSerializer):
     pass
 
 
