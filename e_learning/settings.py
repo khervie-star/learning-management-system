@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'userauth.apps.UserauthConfig',
     'instructor.apps.InstructorConfig',
     'catalog.apps.CatalogConfig',
+    'student.apps.StudentConfig',
     # third party'
 
     'cloudinary',

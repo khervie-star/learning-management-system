@@ -25,6 +25,7 @@ class Course(models.Model):
     # not meant to be nullable. change it
     thumbnail = models.ImageField(upload_to='thumbnail/course/', null=True, blank=True)
     syllabus = models.FileField(upload_to='syllabus/', null=True, blank=True)
+    enrolled_students = models.ManyToManyField(USER)
     slug = models.SlugField(blank=True, max_length=300, unique=True)
     created = models.DateTimeField(auto_now_add=True, null=True)
     updated = models.DateTimeField(auto_now=True, null=True)

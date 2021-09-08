@@ -27,6 +27,9 @@ urlpatterns = [
     # content endpoints
     path('create/content/text/', views.create_text_content, ),
     # [get, delete, update]
-    path('content/text/<int:id>/', views.get_edit_delete_text_content, )
+    path('content/text/<int:id>/', views.get_edit_delete_text_content, ),
+
+    # course enrollments
+    path('enroll', views.course_enrollment),
 
 ]

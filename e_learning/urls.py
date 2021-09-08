@@ -9,4 +9,6 @@ urlpatterns = [
     path('', include('instructor.urls')),
     #  catalog app
     path('catalog/', include('catalog.urls')),
+    # student app
+    path('me/', include('student.urls')),
 ]

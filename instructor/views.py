@@ -4,9 +4,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from instructor.serializers import CourseSerializer, LessonSerializer, TextSerializer, TextEditSerializer
 from instructor.models import Course, Lesson, Content, TextContent, VideoContent
+from student.models import Profile
 
 USER = get_user_model()
 
@@ -138,9 +140,21 @@ class LessonView(APIView):
             return Response({"message": "Course deleted"}, status="200")
 
 
-@api_view([])
-def add_student_to_course(request):
-    pass
+@api_view(['POST'])
+def course_enrollment(request, *args, **kwargs):
+    model = Course
+    authenticated_user = request.user
+
+    # adding the student to to course set
+    course_slug = request.data["course_slug"]
+    course_instance = get_object_or_404(model, slug=course_slug)
+    course_instance.enrolled_students.add(authenticated_user)
+
+    # adding the course to the student profile course set
+    user = get_object_or_404(Profile, user=authenticated_user)
+    user.courses.add(course_instance)
+
+    return Response({"message": "Enrolled successfully"}, status="200")
 
 
 @api_view(["POST"])
