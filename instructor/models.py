@@ -61,7 +61,9 @@ class Lesson(models.Model):
 
 class Content(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='lesson_content')
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, limit_choices_to={
+        "model__in": ("course", "lesson", "textcontent", "VideoContent")
+    })
     target_id = models.PositiveIntegerField()
     target = GenericForeignKey('content_type', 'target_id')
 

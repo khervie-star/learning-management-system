@@ -5,8 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import get_user_model
-from instructor.serializers import CourseSerializer, LessonSerializer
-from instructor.models import Course, Lesson
+from instructor.serializers import CourseSerializer, LessonSerializer, TextSerializer, TextEditSerializer
+from instructor.models import Course, Lesson, Content, TextContent, VideoContent
 
 USER = get_user_model()
 
@@ -59,7 +59,7 @@ class CourseView(APIView):
             return Response({'message': 'Update successful', "data": serialized_data.data}, status="200")
 
     def delete(self, request, *args, **kwargs):
-        slug_ = kwargs.get("id", None)
+        slug_ = kwargs.get("slug", None)
         if not slug_:
             return Response({"error": "method /DELETE/ not allowed"}, status="405")
         try:
@@ -77,28 +77,25 @@ class LessonView(APIView):
     serializer_class = LessonSerializer
 
     def get(self, request, *args, **kwargs):
-        _slug = kwargs.get("slug", None)
+        related_course_slug = kwargs.get("related_course_slug", None)
         lesson_slug = kwargs.get("lesson_slug", None)
-        if not _slug:
+        if lesson_slug:
             # get a  single lesson instance
-            if not lesson_slug:
-                return Response({"message": "provide a lesson refrence/slug"}, status="405")
-            else:
-                try:
-                    lessons = Lesson.objects.get(slug=lesson_slug)
-                except ObjectDoesNotExist:
-                    return Response({"message": "The object refrence/ slug passed does not exists"}, status="405")
-                else:
-                    serialized_object = self.serializer_class(lessons, many=True)
-                    return Response({"data": serialized_object.data}, status="200")
-        else:
-            # get all lessons associated to a course
             try:
-                lesson = Lesson.objects.all(course__slug=_slug)
+                lesson = Lesson.objects.get(slug=lesson_slug)
             except ObjectDoesNotExist:
-                return Response({"status": "Failed", "message": " The object accessed does not exist"}, status="404")
+                return Response({"message": "The object reference/ slug passed does not exists"}, status="405")
             else:
                 serialized_object = self.serializer_class(lesson)
+                return Response({"data": serialized_object.data}, status="200")
+
+        if related_course_slug:
+            # get all lessons associated to a course
+            lessons = Lesson.objects.filter(course__slug=related_course_slug)
+            if not lessons.exists():
+                return Response({"status": "Failed", "message": "The object accessed does not exist"}, status="404")
+            else:
+                serialized_object = self.serializer_class(lessons, many=True)
                 return Response({"data": serialized_object.data}, status="200")
 
     def post(self, request):
@@ -114,11 +111,11 @@ class LessonView(APIView):
             return Response({"status": "Success", "Message": "Course created successfully", "data": serialized_data.data}, status="201")
 
     def patch(self, request, *args, **kwargs):
-        _slug = kwargs.get("slug", None)
+        related_course_slug = kwargs.get("related_course_slug", None)
         if not _slug:
             return Response({"error": "method /PATCH/ not allowed"}, status="405")
         try:
-            lesson_object = Lesson.objects.get(course__slug=_slug)
+            lesson_object = Lesson.objects.get(course__slug=related_course_slug)
         except ObjectDoesNotExist:
             return Response({"error": "method /PATCH/ not allowed"}, status="405")
         else:
@@ -129,7 +126,7 @@ class LessonView(APIView):
             return Response({'message': 'Update successful', "data": serialized_data.data}, status="200")
 
     def delete(self, request, *args, **kwargs):
-        slug_ = kwargs.get("id", None)
+        slug_ = kwargs.get("related_course_slug", None)
         if not slug_:
             return Response({"error": "method /DELETE/ not allowed"}, status="405")
         try:
@@ -141,10 +138,52 @@ class LessonView(APIView):
             return Response({"message": "Course deleted"}, status="200")
 
 
-class ContentView(APIView):
-    pass
-
-
 @api_view([])
 def add_student_to_course(request):
     pass
+
+
+@api_view(["POST"])
+def create_text_content(request):
+    serializer = TextSerializer
+    serialized_data = serializer(data=request.data)
+    serialized_data.is_valid(raise_exception=True)
+    related_lesson = serialized_data["related_lesson_slug"].value
+    try:
+        lesson = Lesson.objects.get(slug=related_lesson)
+    except ObjectDoesNotExist:
+        return Response({"status": "Failed", "message": "The object received related_lesson_slug does not exist"}, status="404")
+    else:
+        text_instance = TextContent.objects.create(content=serialized_data["content"].value)
+        content_instance = Content(target=text_instance, lesson=lesson)
+        content_instance = content_instance.save()
+    return Response({"message": "Text Content Created", "data": serialized_data.data, "content_type": content_instance.content_object}, status="200")
+
+
+@api_view(['PATCH', 'GET', 'DELETE'])
+def get_edit_delete_text_content(request, id, *args, **kwargs):
+
+    serializer = TextEditSerializer
+
+    try:
+        text_instance = TextContent.objects.get(id=id)
+    except ObjectDoesNotExist:
+        return Response({"message": "The id passed is not valid"}, status="404")
+    else:
+
+        if request.method == 'GET':
+            serialized_data = serializer(text_instance)
+            return Response({"data": serialized_data.data}, status="200")
+
+        elif request.method == 'DELETE':
+            text_instance.delete()
+            return Response({"message": "Content Deleted"}, status="200")
+
+        elif request.method == 'PATCH':
+            received_data = request.data
+            serialized_data = serializer(data=received_data)
+            serialized_data.is_valid(raise_exception=True)
+            TextContent.objects.filter(id=text_instance.id).update(**serialized_data.data)
+            return Response({"message": "Updated Content"}, status="200")
+        else:
+            pass

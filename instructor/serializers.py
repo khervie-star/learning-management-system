@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from instructor.models import Course, Lesson, Content
+from instructor.models import Course, Lesson, Content, TextContent
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -24,9 +24,18 @@ class LessonSerializer(serializers.ModelSerializer):
         model = Lesson
         fields = '__all__'
         read_only_fields = (
-            'created', 'updated', 'slug'
+            'created', 'updated', 'slug',
         )
 
 
 class ContentSerializer(serializers.ModelSerializer):
     pass
+
+
+class TextSerializer(serializers.Serializer):
+    related_lesson_slug = serializers.CharField()
+    content = serializers.CharField()
+
+
+class TextEditSerializer(serializers.Serializer):
+    content = serializers.CharField()
