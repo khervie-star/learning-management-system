@@ -13,5 +13,16 @@ class Rating(models.Model):
     count = models.PositiveIntegerField(
         default=0, validators=[MinValueValidator(0), MaxValueValidator(5)], null=True)
 
-    def average_rating():
-        pass
+    def average_rating(self, course):
+        count = 0
+        average = 0
+        course_rating = Rating.objects.filter(course=course)
+
+        if not course_rating.exists():
+            return False
+        else:
+            course_rating = list(course_rating)
+            for rating in course_rating:
+                count += rating.count
+            total_rates = len(course_rating)
+            return count//total_rates
