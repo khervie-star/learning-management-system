@@ -11,4 +11,6 @@ urlpatterns = [
     path('catalog/', include('catalog.urls')),
     # student app
     path('me/', include('student.urls')),
+    # Review / Rating app
+    path('ratings/', include('review.urls')),
 ]

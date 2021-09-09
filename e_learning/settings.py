@@ -19,7 +19,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']  # <- change
 
 AUTH_USER_MODEL = 'userauth.CustomUser'
 
@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'instructor.apps.InstructorConfig',
     'catalog.apps.CatalogConfig',
     'student.apps.StudentConfig',
+    'review.apps.ReviewConfig',
     # third party'
 
     'cloudinary',
