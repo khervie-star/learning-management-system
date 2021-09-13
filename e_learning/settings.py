@@ -32,11 +32,11 @@ INSTALLED_APPS = [
     # my apps
     'userauth.apps.UserauthConfig',
     'course.apps.CourseConfig',
-    # 'catalog.apps.CatalogConfig',
-    # 'student.apps.StudentConfig',
-    # 'review.apps.ReviewConfig',
-    # 'wallet.apps.WalletConfig',
-    # 'instructor.apps.InstructorConfig',
+    'catalog.apps.CatalogConfig',
+    'student.apps.StudentConfig',
+    'review.apps.ReviewConfig',
+    'wallet.apps.WalletConfig',
+    'instructor.apps.InstructorConfig',
     # third party'
 
     'cloudinary',

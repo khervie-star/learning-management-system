@@ -6,8 +6,12 @@ from django.contrib.auth import get_user_model
 from review.serializers import RatingSerializer
 from review.models import Rating
 
+<<<<<<< HEAD
 from course.models import Course
 from course.serializers import CourseSerializer
+=======
+from instructor.models import Course
+>>>>>>> parent of 4ebefed (Rating:average rating endpoint)
 from student.models import Profile
 
 # Just used to test the endpoint
@@ -79,20 +83,3 @@ def rate_course(request):
                 data = Rating.objects.get(course=course, rated_by=authenticated_user)
                 serialized_data = serializer(data).data
                 return Response({"message": "Updated", "data": serialized_data}, status="200")
-
-
-@api_view(['GET'])
-def course_average_rating(request):
-    serializer = CourseSerializer
-    course_slug = request.data["course_slug"]
-    try:
-        course = Course.objects.get(slug=course_slug)
-    except ObjectDoesNotExist:
-        return Response({"message": "The passed course_slug doesn't exist"}, status="404")
-    else:
-        rating = Rating().average_rating(course)
-        if not rating:
-            return Response({"message": "Course has not been rated"})
-        else:
-            serialized_data = serializer(course)
-            return Response({"rating": rating, "course": serialized_data.data})

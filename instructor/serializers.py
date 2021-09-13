@@ -1,9 +1,8 @@
 from rest_framework import serializers
-from course.models import Course, Lesson, CourseContent, TextContent
+from instructor.models import Course, Lesson, Content, TextContent
 
 
 class CourseSerializer(serializers.ModelSerializer):
-    # ratings = serializers.IntegerField()
     author = serializers.SerializerMethodField('get_author_name')
     course_lessons = serializers.SlugRelatedField(slug_field="slug", many=True, read_only=True)
 
@@ -27,8 +26,6 @@ class LessonSerializer(serializers.ModelSerializer):
         read_only_fields = (
             'created', 'updated', 'slug',
         )
-
-#  not yet implemented
 
 
 class VideoContentSerializer(serializers.ModelSerializer):

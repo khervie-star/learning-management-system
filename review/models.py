@@ -17,16 +17,5 @@ class Rating(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
 
-    def average_rating(self, course):
-        count = 0
-        average = 0
-        course_rating = Rating.objects.filter(course=course)
-
-        if not course_rating.exists():
-            return False
-        else:
-            course_rating = list(course_rating)
-            for rating in course_rating:
-                count += rating.count
-            total_rates = len(course_rating)
-            return count//total_rates
+    def average_rating():
+        pass
