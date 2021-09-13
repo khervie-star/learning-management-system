@@ -11,7 +11,6 @@ class Wallet(models.Model):
     wallet_owner = models.ForeignKey(
         Instructor, null=True, on_delete=models.CASCADE, related_name="my_wallet")
     balance = models.FloatField(default=0.00)
-    account_number = models.PositiveIntegerField(null=True, default=0)
     wallet_ref = models.CharField(max_length=500, null=True, blank=True)
 
     def __str__(self):
@@ -65,4 +64,6 @@ class Payment(models.Model):
             self.save()
             if self.verified:
                 return True, result
+            else:
+                self.verified = False
         return False, result

@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.urls import path, include
 
+from wallet import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     # user auth app
@@ -15,4 +17,7 @@ urlpatterns = [
     path('ratings/', include('review.urls')),
     # Wallet app
     path('payment/', include('wallet.urls')),
+    # wallet details
+    path('wallet/', views.my_wallet),
+
 ]

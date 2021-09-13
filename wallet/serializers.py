@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from wallet.models import Payment
+from wallet.models import Payment, Wallet
 
 from course.models import Course
 
@@ -25,4 +25,10 @@ class InitiatePaymentSerializer(serializers.ModelSerializer):
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
+        fields = '__all__'
+
+
+class WalletSerilaizer(serializers.ModelSerializer):
+    class Meta:
+        model = Wallet
         fields = '__all__'

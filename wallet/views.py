@@ -3,9 +3,13 @@ from rest_framework.decorators import api_view
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 
-from wallet.serializers import VerifyPaymentSerializer, InitiatePaymentSerializer, PaymentSerializer
+from wallet.serializers import (
+    VerifyPaymentSerializer, InitiatePaymentSerializer,
+    PaymentSerializer, WalletSerilaizer
+)
 from wallet.models import Payment, Wallet
 from course.models import Course
+from instructor.models import Instructor
 
 
 @api_view(['POST'])
@@ -51,10 +55,35 @@ def verify_payment(request):
         payment.transaction_ref = serialized_data["transaction_reference"].value
         payment.save()
         verify_payment, message = payment.verify_payment()
+
+        # verify the payment
         if verify_payment:
+            # update instructor wallet on successfully payment
+            instructor = Instructor.objects.get(Instructor=payment.course_to_enroll.author)
+
+            wallet = wallet.objects.get(wallet_owner=instructor)
+            wallet.balance += payment.course_to_enroll.price
+            wallet.save()
+
             return Response({"status": True, "message": "Payment successfully"}, status="200")
         else:
             return Response({"status": False, "message": message}, status="200")
 
-# update instructor wallet
-# checkout wallet
+
+"""
+only an instance of an instructor should call this endpoint
+"""
+
+
+@api_view(['GET'])
+def my_wallet(request):
+    serializer = WalletSerilaizer
+    authenticated_user = request.user
+    try:
+        instructor = Instructor.objects.get(instructor=authenticated_user)
+    except ObjectDoesNotExist:
+        return Response({"message": "Access Denied. You are not an instructor"}, status="403")
+    else:
+        wallet = Wallet.objects.get(wallet_owner=instructor)
+        serialized_data = serializer(wallet)
+        return Response({"data": serialized_data.data}, status="200")
