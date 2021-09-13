@@ -6,12 +6,12 @@ from django.contrib.auth import get_user_model
 from review.serializers import RatingSerializer
 from review.models import Rating
 
-from instructor.models import Course
-from instructor.serializers import CourseSerializer
+from course.models import Course
+from course.serializers import CourseSerializer
 from student.models import Profile
 
 # Just used to test the endpoint
-User = get_user_model().objects.all()[0]
+# User = get_user_model().objects.all()[0]
 
 
 @api_view(['POST', 'GET', 'PATCH'])
@@ -42,7 +42,7 @@ def rate_course(request):
                         return Response({"message": "You have rated this course already. You probably should be calling the update endpoint or get"}, status="409")
                     else:
                         rating = Rating.objects.create(
-                            course=course, rated_by=authenticated_user, count=count
+                            course=course, rated_by=authenticated_user, **request.data
                         )
                         serialized_response = serializer(rating).data
                         return Response({'message': "Rated", 'data': serialized_response})
@@ -65,7 +65,7 @@ def rate_course(request):
 
     if request.method == 'PATCH':
         slug = request.data["course_slug"]
-        count = request.data["count"]
+        received_data = request.data
         try:
             course = Course.objects.get(slug=slug)
         except ObjectDoesNotExist:
@@ -75,7 +75,7 @@ def rate_course(request):
             if not rating.exists():
                 return Response({"message": "You have not rated this course"})
             else:
-                rating.update(count=count)
+                rating.update(**received_data)
                 data = Rating.objects.get(course=course, rated_by=authenticated_user)
                 serialized_data = serializer(data).data
                 return Response({"message": "Updated", "data": serialized_data}, status="200")

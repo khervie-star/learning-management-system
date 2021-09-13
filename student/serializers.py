@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer
 
 from student.models import Profile
-from instructor.serializers import CourseSerializer
+from course.serializers import CourseSerializer
 
 
 class ProfileSerializer(ModelSerializer):

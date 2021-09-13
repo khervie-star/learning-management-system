@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
+import django_heroku
+
 load_dotenv()  # takes enviroment variables from .env
 env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
 load_dotenv(dotenv_path=env_path)
@@ -29,10 +31,12 @@ AUTH_USER_MODEL = 'userauth.CustomUser'
 INSTALLED_APPS = [
     # my apps
     'userauth.apps.UserauthConfig',
-    'instructor.apps.InstructorConfig',
-    'catalog.apps.CatalogConfig',
-    'student.apps.StudentConfig',
-    'review.apps.ReviewConfig',
+    'course.apps.CourseConfig',
+    # 'catalog.apps.CatalogConfig',
+    # 'student.apps.StudentConfig',
+    # 'review.apps.ReviewConfig',
+    # 'wallet.apps.WalletConfig',
+    # 'instructor.apps.InstructorConfig',
     # third party'
 
     'cloudinary',
@@ -148,3 +152,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+
+django_heroku.settings(locals())
+
+
+# PAYSTACK
+
+PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_TEST_SECRET_KEY')
+PAYSTACK_PUBLIC_KEY = os.getenv('PAYSTACK_TEST_PUBLIC_KEY')
