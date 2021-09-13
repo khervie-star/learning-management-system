@@ -5,13 +5,8 @@ from django.contrib.auth import get_user_model
 
 from review.serializers import RatingSerializer
 from review.models import Rating
-
-<<<<<<< HEAD
 from course.models import Course
 from course.serializers import CourseSerializer
-=======
-from instructor.models import Course
->>>>>>> parent of 4ebefed (Rating:average rating endpoint)
 from student.models import Profile
 
 # Just used to test the endpoint

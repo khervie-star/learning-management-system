@@ -3,6 +3,8 @@ from django.db import models
 
 from instructor.models import Instructor
 from course.models import Course
+from student.models import Profile
+from wallet.paystack import PayStack
 
 
 class Wallet(models.Model):
@@ -32,11 +34,14 @@ class TransactionLog(models.Model):
 
 
 class Payment(models.Model):
-    course_to_enroll = models.ForeignKey(Course, on_delete=models.PROTECT)
-    amount = models.PositiveIntegerField()
+    auth_student = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, blank=True)
+    course_to_enroll = models.ForeignKey(
+        Course, on_delete=models.PROTECT, related_name="course_payment")
+    amount = models.PositiveIntegerField(null=True, blank=True)
     reference = models.CharField(max_length=200, null=True, blank=True)
-    email = models.EmailField(null=True, blank=True)
+    email = models.EmailField()
     verified = models.BooleanField(default=False)
+    transaction_ref = models.CharField(max_length=1000, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         while not self.reference:
@@ -45,3 +50,19 @@ class Payment(models.Model):
             if not object:
                 self.reference = ref
         super(Payment, self).save(*args, **kwargs)
+
+    @staticmethod
+    def get_amount(self):
+        return self.amount * 100
+
+    def verify_payment(self):
+        paystack_object = PayStack()
+        status, result = paystack_object.verify_payment(self.transaction_ref)
+        if status:
+            # remeber that the paystack currency is always multiplied by 100 to convert to the least currency unit...
+            if result['amount']/100 >= self.amount:
+                self.verified = True
+            self.save()
+            if self.verified:
+                return True, result
+        return False, result

@@ -6,13 +6,13 @@ urlpatterns = [
     # user auth app
     path('user/', include("userauth.urls", )),
     # instructor app
-    # path('', include('course.urls')),
-    #  catalog app
-    # path('catalog/', include('catalog.urls')),
-    # # student app
-    # path('me/', include('student.urls')),
-    # # Review / Rating app
-    # path('ratings/', include('review.urls')),
-    # # Wallet app
-    # path('payment/', include('wallet.urls')),
+    path('', include('course.urls')),
+    # catalog app
+    path('catalog/', include('catalog.urls')),
+    # student app
+    path('me/', include('student.urls')),
+    # Review / Rating app
+    path('ratings/', include('review.urls')),
+    # Wallet app
+    path('payment/', include('wallet.urls')),
 ]

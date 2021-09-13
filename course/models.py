@@ -65,6 +65,11 @@ class Course(models.Model):
         return super(Course, self).save(*args, **kwargs)
 
 
+"""
+Remeber to deal with paystack's minumum payment i.e * 100
+"""
+
+
 class Lesson(models.Model):
     name = models.CharField(max_length=1000)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_lessons')
