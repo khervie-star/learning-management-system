@@ -40,6 +40,7 @@ class Payment(models.Model):
     reference = models.CharField(max_length=200, null=True, blank=True)
     email = models.EmailField()
     verified = models.BooleanField(default=False)
+
     transaction_ref = models.CharField(max_length=1000, null=True, blank=True)
 
     def save(self, *args, **kwargs):
@@ -69,5 +70,19 @@ class Payment(models.Model):
         return False, result
 
 
-class Transfers():
-    pass
+class Transfers(models.Model):
+    instructor = models.ForeignKey(
+        Instructor, on_delete=models.PROTECT, related_name="my_transfers")
+    bank_type = models.CharField(max_length=500, null=True, blank=True)
+    account_number = models.PositiveIntegerField()
+    account_name = models.CharField(max_length=200, null=True, blank=True)
+    bank_code = models.PositiveIntegerField(null=True, blank=True)
+    currency = models.CharField(max_length=10, null=True, blank=True)
+    recipient_code = models.CharField(max_length=1000, null=True, blank=True)
+    payment_account_resolved = models.BooleanField(default=False)
+    tranferred = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "Transfers"

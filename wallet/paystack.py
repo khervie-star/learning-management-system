@@ -67,3 +67,31 @@ class PayStack:
         else:
             # -> {status, msg, data:{name, slug, code, type, currency}}
             return True, _request.json()
+
+    @staticmethod
+    def transfer_recipient(bank_type: str, name: str, account_number: int, bank_code: int, currency: str) -> dict:
+        transfer_recipient_ endpoint = '/transferrecipient'
+        method = 'POST'
+        headers = {
+            'Authorization':  f'Bearer {PayStack().PAYSTACK_SECRET_KEY}',
+            'Content-Type': 'application/json'
+        }
+
+        params = {
+            "type": bank_type,
+            "name": name,
+            "account_number": account_number,
+            "bank_code": bank_code,
+            "currency": currency
+        }
+
+        params = json.dumps(params)
+
+        path = PayStack().BASE_URL + transfer_recipient_endpoint
+
+        _request = requests.post(path, data=params, headers=headers)
+
+        if not _request.status_code >= 200 and _request.status_code <= 300:
+            return False, _request.json()
+        else:
+            return True, _request.json()
