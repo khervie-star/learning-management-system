@@ -41,8 +41,29 @@ class PayStack:
 
         _request = requests.get(path, headers=headers)
 
-        if _request.status_code == 200:
+        if not _request.status_code == 200:
             # -> {status, msg, data:{account_number, account_name, bank_id}}
-            return True, _request.json()
-        else:
             return False, _request.json()
+        else:
+            return True, _request.json()
+
+    @staticmethod
+    def bank_list():
+        """
+        Lists the available PayStack's banks details i.e bank_code
+        """
+        bank_list_endpoint = "/bank"
+        path = PayStack().BASE_URL + bank_list_endpoint
+        mathod = 'GET'
+        headers = {
+            'Authorization':  f'Bearer {PayStack().PAYSTACK_SECRET_KEY}',
+            'Content-Type': 'application/json'
+        }
+
+        _request = requests.get(path, headers=headers)
+
+        if not _request.status_code == 200:
+            return False, _request.json()
+        else:
+            # -> {status, msg, data:{name, slug, code, type, currency}}
+            return True, _request.json()
