@@ -70,7 +70,7 @@ class PayStack:
 
     @staticmethod
     def transfer_recipient(bank_type: str, name: str, account_number: int, bank_code: int, currency: str) -> dict:
-        transfer_recipient_ endpoint = '/transferrecipient'
+        transfer_recipient_endpoint = '/transferrecipient'
         method = 'POST'
         headers = {
             'Authorization':  f'Bearer {PayStack().PAYSTACK_SECRET_KEY}',
@@ -94,4 +94,37 @@ class PayStack:
         if not _request.status_code >= 200 and _request.status_code <= 300:
             return False, _request.json()
         else:
-            return True, _request.json()
+            return True, _request.json()  # -> {status, msg, data: {recipient_code}}
+
+    def initiate_transfer(amount, receipient_code):
+        """
+        This makes the actual transfer
+        """
+        transfer_endpoint = '/transfer'
+        headers = {
+            'Authorization':  f'Bearer {PayStack().PAYSTACK_SECRET_KEY}',
+            'Content-Type': 'application/json'
+        }
+
+        path = PayStack().BASE_URL + transfer_endpoint
+
+        method = 'POST'
+
+        params = {
+            "source": "balance",
+            "amount": amount,
+            "receipent": receipent_code,
+            "reason": "checkout Wallet"
+        }
+
+        params = json.dumps(params)
+
+        _request = requests.post(path, data=params, headers=headers)
+
+        if not _request.status_code >= 200 and _request.status_code <= 300:
+            return False, _request.json()
+        else:
+            return True, _request.json()  # -> {status, msg, data: {reference}}
+
+
+# how to retry transfers
