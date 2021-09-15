@@ -1,4 +1,7 @@
-## Wallet Sytem
 
-1. An instance of a wallet is associated with a verified user
-2. Should be related with an instance of an instructor
+## checkout wallet
+
+1. verify the account number [Today]
+2. create transfer receipent
+3. initiate transfer
+4. listen for transfer status

@@ -67,3 +67,7 @@ class Payment(models.Model):
             else:
                 self.verified = False
         return False, result
+
+
+class Transfers():
+    pass

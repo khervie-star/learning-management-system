@@ -24,3 +24,25 @@ class PayStack:
             return data['status'], data['data']
         else:
             return data['status'], data['message']
+
+    @staticmethod
+    def resolve_account_number(account_number: int, bank_code: int) -> dict:
+        """
+        Verifies a given account number
+        """
+        resolve_account_number_endpoint = f"/bank/resolve?account_number={account_number}&bank_code={bank_code}"
+        method = 'GET'
+        headers = {
+            'Authorization':  f'Bearer {PayStack().PAYSTACK_SECRET_KEY}',
+            'Content-Type': 'application/json'
+        }
+
+        path = PayStack().BASE_URL + resolve_account_number_endpoint
+
+        _request = requests.get(path, headers=headers)
+
+        if _request.status_code == 200:
+            # -> {status, msg, data:{account_number, account_name, bank_id}}
+            return True, _request.json()
+        else:
+            return False, _request.json()
