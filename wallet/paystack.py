@@ -97,6 +97,7 @@ class PayStack:
         else:
             return True, _request.json()  # -> {status, msg, data: {recipient_code}}
 
+    @staticmethod
     def initiate_transfer(amount, receipient_code):
         """
         This makes the actual transfer
