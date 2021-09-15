@@ -98,7 +98,7 @@ class PayStack:
             return True, _request.json()  # -> {status, msg, data: {recipient_code}}
 
     @staticmethod
-    def initiate_transfer(amount, receipient_code):
+    def initiate_transfer(amount, recipient_code):
         """
         This makes the actual transfer
         """
@@ -115,7 +115,7 @@ class PayStack:
         params = {
             "source": "balance",
             "amount": amount,
-            "receipent": receipent_code,
+            "recipient": recipient_code,
             "reason": "checkout Wallet"
         }
 
