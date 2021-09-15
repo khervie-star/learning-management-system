@@ -76,12 +76,16 @@ class Transfers(models.Model):
     bank_type = models.CharField(max_length=500, null=True, blank=True)
     account_number = models.PositiveIntegerField()
     account_name = models.CharField(max_length=200, null=True, blank=True)
-    amount = models.PositiveIntegerField()
+    # change this to not nullable and not blank
+    amount = models.PositiveIntegerField(null=True, blank=True)
     bank_code = models.PositiveIntegerField(null=True, blank=True)
     bank_name = models.CharField(max_length=2000, null=True, blank=True)
+    bank_type = models.CharField(max_length=2000, null=True, blank=True)
     currency = models.CharField(max_length=10, null=True, blank=True)
     recipient_code = models.CharField(max_length=1000, null=True, blank=True)
     payment_account_resolved = models.BooleanField(default=False)
+    # change this to not nullable and not blank
+    transfer_reference = models.CharField(max_length=500, null=True, blank=True)
     tranferred = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

@@ -42,9 +42,9 @@ class PayStack:
         _request = requests.get(path, headers=headers)
 
         if not _request.status_code == 200:
-            # -> {status, msg, data:{account_number, account_name, bank_id}}
             return False, _request.json()
         else:
+            # -> {status, msg, data:{account_number, account_name, bank_id}}
             return True, _request.json()
 
     @staticmethod
@@ -70,6 +70,7 @@ class PayStack:
 
     @staticmethod
     def transfer_recipient(bank_type: str, name: str, account_number: int, bank_code: int, currency: str) -> dict:
+        # name is account name
         transfer_recipient_endpoint = '/transferrecipient'
         method = 'POST'
         headers = {
@@ -128,3 +129,4 @@ class PayStack:
 
 
 # how to retry transfers
+# listen for transfer status
