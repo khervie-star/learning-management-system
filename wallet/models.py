@@ -1,5 +1,6 @@
 import secrets
 from django.db import models
+from django.utils import timezone
 
 from instructor.models import Instructor
 from course.models import Course
@@ -26,10 +27,6 @@ class Wallet(models.Model):
 
     class Meta:
         verbose_name_plural = "wallet"
-
-
-class TransactionLog(models.Model):
-    pass
 
 
 class Payment(models.Model):
@@ -92,3 +89,16 @@ class Transfers(models.Model):
 
     class Meta:
         verbose_name_plural = "Transfers"
+
+
+class TransactionLog(models.Model):
+
+    STATUS = (
+        ('pending', 'pending'), ('failed', 'failed'), ('success', 'success')
+    )
+
+    transfer = models.ForeignKey(Transfers, on_delete=models.CASCADE,
+                                 related_name="transaction_log", null=True)
+    status = models.CharField(choices=STATUS, max_length=20, default="pending")
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)

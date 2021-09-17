@@ -1,9 +1,10 @@
+import json
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from django.contrib.auth import get_user_model
 
-from wallet.models import Transfers, Wallet
+from wallet.models import Transfers, Wallet, Payment, TransactionLog
 from instructor.models import Instructor
 from wallet.paystack import PayStack as PS
 
@@ -11,11 +12,11 @@ from wallet.paystack import PayStack as PS
 # ensure the money they want to transfer is actually in their wallet
 
 # just for testing purpose now
-User = get_user_model().objects.all()[0]
+# User = get_user_model().objects.all()[0]
 
 
 @api_view(['POST'])
-def verify_account_number(request, *args, **kwargs):
+def verify_account(request, *args, **kwargs):
     # Only instances of an Instructor should be allowed
     """
     A form should be displayed to the user at the frontend
@@ -28,9 +29,9 @@ def verify_account_number(request, *args, **kwargs):
     --> bank_name
     --> amount
     """
-    # authenticated_user = request.user
+    authenticated_user = request.user
     # change this line
-    authenticated_user = User
+    # authenticated_user = User
     received_data = request.data
     # serializer all of this
     account_number = received_data["account_number"]
@@ -62,6 +63,8 @@ def verify_account_number(request, *args, **kwargs):
         account_name=data["account_name"], bank_code=bank_code, currency=currency,
         bank_name=bank_name, bank_type=bank_type, amount=amount
     )
+
+    TransactionLog.objects.create(transfer=transfer_instance)
 
     # create transfer receipent
     params = {
@@ -95,11 +98,46 @@ def verify_account_number(request, *args, **kwargs):
     transfer_instance.save()
 
     # deduct wallet balance on successfully transfer
+    # if transaction failed refund wallet balance from webhook
+
+    wallet_instance.balance -= transfer_instance.amount
+    wallet_instance.save()
+
     return Response({}, status="200")
 
 
 @api_view(['POST'])
 def transfer_status_webhook(*args, **kwargs):
-    event = request.body
+    """
+    when we move to production
+    localhost url cannot receive events
+
+    also verify the event is coming from paystack
+    """
+
+    event = json.loads(request.body)
+
+    # get receipent code
+    recipient_code = event["data"]["recipient"]["recipient_code"]
+    transaction_log_inst = TransactionLog.objects.get(transfer__recipient_code=recipient_code)
+
+    if event["event"] == "transfer.failed":
+        # in transaction table show that transaction failed
+        transaction_log_inst.status = "failed"
+        transaction_log_inst.save()
+
+        # update[increament] wallet back
+
+        instructor = transaction_log_inst.transfer.instructor
+        wallet_inst = Wallet.objects.get(wallet_owner=instructor)
+        wallet_inst.balance += transfer_inst.amount
+        wallet_inst.save()
+
+    elif event["event"] == "transfer.success":
+        transaction_log_inst.status = "success"
+        transaction_log_inst.save()
+
+    else:
+        pass
 
     return Response(status="200")

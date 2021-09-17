@@ -70,13 +70,12 @@ def verify_payment(request):
             return Response({"status": False, "message": message}, status="200")
 
 
-"""
-only an instance of an instructor should call this endpoint
-"""
-
-
 @api_view(['GET'])
 def my_wallet(request):
+    """
+    only an instance of an instructor should call this endpoint
+    """
+
     serializer = WalletSerilaizer
     authenticated_user = request.user
     try:
@@ -87,3 +86,8 @@ def my_wallet(request):
         wallet = Wallet.objects.get(wallet_owner=instructor)
         serialized_data = serializer(wallet)
         return Response({"data": serialized_data.data}, status="200")
+
+
+"""
+Get transaction details
+"""

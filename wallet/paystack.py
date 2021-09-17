@@ -128,6 +128,9 @@ class PayStack:
         else:
             return True, _request.json()  # -> {status, msg, data: {reference}}
 
+    def fetch_transfer():
+        pass
+
 
 # how to retry transfers
 # listen for transfer status
